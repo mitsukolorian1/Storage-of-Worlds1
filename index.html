@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Библиотека персонажей · все книги</title>
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ========== ОБЩИЕ СТИЛИ ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #f5efe9;
+            color: #2c2c2c;
+            line-height: 1.5;
+            padding: clamp(10px, 2vw, 20px);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page {
+            max-width: min(1300px, 95%);
+            margin: 0 auto;
+            background: #fffcf8;
+            border-radius: max(20px, 2.5vw);
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.2);
+            padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2.5rem);
+            width: 100%;
+            flex: 1;
+        }
+
+        /* ========== НАВИГАЦИЯ ========== */
+        .breadcrumb-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem 1rem;
+            margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            background: #f0e7de;
+            padding: 0.8rem 1.5rem;
+            border-radius: 48px;
+            word-break: break-word;
+        }
+
+        .breadcrumb-nav a {
+            color: #5e3c28;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        @media (max-width: 480px) {
+            .breadcrumb-nav a { white-space: normal; }
+        }
+
+        .breadcrumb-nav a:hover {
+            color: #a75b36;
+            text-decoration: underline;
+        }
+
+        .breadcrumb-nav .separator {
+            color: #b0927e;
+            font-weight: 300;
+            font-size: 1.2rem;
+        }
+
+        /* ========== ЗАГОЛОВКИ ========== */
+        h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #3e2c1f;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        h1 i {
+            color: #b07d5e;
+            font-size: 1.2em;
+        }
+
+        .subhead {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #6f5340;
+            margin-bottom: 2rem;
+            border-left: 6px solid #dbb79b;
+            padding-left: 1.2rem;
+        }
+
+        /* ========== ГЛАВНАЯ СЕТКА КНИГ ========== */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(1rem, 2.5vw, 2rem);
+            margin: 2rem 0 3rem;
+        }
+
+        @media (max-width: 800px) {
+            .grid-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 500px) {
+            .grid-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .book-card {
+            background: #fff5ed;
+            border-radius: 28px;
+            padding: 1.8rem 1rem 1.2rem;
+            box-shadow: 0 10px 18px -6px rgba(98, 64, 46, 0.15);
+            transition: transform 0.15s ease, box-shadow 0.2s;
+            border: 1px solid #ffe8da;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 28px -14px #ab7f63;
+        }
+
+        .book-icon {
+            font-size: clamp(2.5rem, 6vw, 3.8rem);
+            color: #b25f39;
+            margin-bottom: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .book-title {
+            font-size: clamp(1.4rem, 3vw, 1.9rem);
+            font-weight: 600;
+            margin: 0.25rem 0 0.5rem;
+            word-break: break-word;
+            flex-shrink: 0;
+            min-height: 4.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .book-meta {
+            color: #7c6050;
+            margin-bottom: 0.8rem;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            flex-shrink: 0;
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .folder-links {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin: 0.8rem 0 0.4rem;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .folder-link {
+            background: #e6d5c8;
+            color: #402e22;
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            transition: 0.2s;
+            border: 1px solid #dabdab;
+            white-space: nowrap;
+        }
+        @media (max-width: 400px) {
+            .folder-link { white-space: normal; }
+        }
+
+        .folder-link i {
+            font-size: 0.9rem;
+            color: #a75b36;
+        }
+
+        .folder-link:hover {
+            background: #cfb6a4;
+            color: #22170f;
+            border-color: #b28466;
+        }
+
+        .book-card p {
+            margin-top: 0.8rem;
+            color: #5f4a3a;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            word-break: break-word;
+            overflow-wrap: break-word;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== СТРАНИЦА КНИГИ ========== */
+        .book-sections {
+            display: flex;
+            gap: clamp(1rem, 3vw, 2rem);
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+        }
+
+        .section-folder {
+            flex: 1 1 280px;
+            background: #f3e7de;
+            border-radius: 2.5rem;
+            padding: clamp(1.5rem, 3vw, 2.5rem) clamp(1.2rem, 2.5vw, 2rem);
+            box-shadow: 0 8px 22px -8px #b9a089;
+            transition: 0.2s;
+            border: 2px solid #ebdad0;
+            width: 100%;
+            max-width: 100%;
+            overflow-wrap: break-word;
+        }
+
+        .folder-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            color: #834e31;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .folder-header h2 {
+            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+            font-weight: 600;
+            color: #4e3626;
+        }
+
+        .folder-link-inside {
+            display: inline-block;
+            margin-top: 1rem;
+            background: #dac2b2;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            color: #2f1d12;
+            text-decoration: none;
+            font-weight: 500;
+            border: 1px solid #b58f78;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            word-break: break-word;
+        }
+
+        .folder-link-inside i {
+            margin-right: 0.5rem;
+        }
+
+        .folder-link-inside:hover {
+            background: #c5a48b;
+        }
+
+        /* ========== СПИСОК ПЕРСОНАЖЕЙ ========== */
+        .character-item {
+            background: #fefbf9;
+            border-radius: 40px;
+            padding: 0.6rem 1.2rem;
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            border: 1px solid #ddc8ba;
+            box-shadow: 0 2px 6px #e3cfc0;
+            width: 100%;
+            overflow-wrap: break-word;
+        }
+
+        .character-item a {
+            text-decoration: none;
+            color: #412f24;
+            font-weight: 500;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        .character-item i {
+            color: #b2653b;
+            width: 1.6rem;
+            text-align: center;
+        }
+
+        .character-item:hover {
+            background: #ead9cd;
+        }
+
+        /* ========== СТРАНИЦА СЮЖЕТА ========== */
+        .book-cover {
+            background: #f3e0d1;
+            border-radius: 48px 48px 16px 16px;
+            padding: clamp(1.5rem, 4vw, 2.5rem);
+            margin: 2rem 0;
+            border: 1px solid #dbb59b;
+            box-shadow: 0 10px 20px rgba(80, 50, 30, 0.15);
+            position: relative;
+            width: 100%;
+        }
+
+        .chapter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 2rem 0;
+        }
+
+        .chapter-item {
+            background: #fcf3ea;
+            border-radius: 60px;
+            border: 1px solid #dbbcac;
+            transition: 0.2s;
+            width: 100%;
+        }
+
+        .chapter-item a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: #3f2a1b;
+            font-weight: 500;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            gap: 1rem;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        .chapter-item i {
+            color: #b2653b;
+            font-size: 1.6rem;
+            width: 2rem;
+        }
+
+        .chapter-item:hover {
+            background: #e7cfbe;
+            transform: translateX(6px);
+        }
+
+        /* ========== СТРАНИЦА ГЛАВЫ (С КРАСНОЙ СТРОКОЙ) ========== */
+        .chapter-page {
+            background: #fcf3ea;
+            border-radius: 48px;
+            padding: clamp(1.5rem, 4vw, 2.5rem);
+            margin: 2rem 0;
+            border: 2px solid #e3cbbd;
+            width: 100%;
+        }
+
+        .chapter-title {
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            color: #4e3322;
+            border-bottom: 3px dashed #cbaa93;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            word-break: break-word;
+        }
+
+        /* СТИЛИ ДЛЯ КРАСНОЙ СТРОКИ */
+        .chapter-content {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            line-height: 1.8;
+            background: #fff9f2;
+            padding: clamp(1.2rem, 3vw, 2rem);
+            border-radius: 32px;
+            border: 1px solid #e4cfbf;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            text-align: justify; /* выравнивание по ширине */
+        }
+
+        .chapter-content p {
+            text-indent: 30px; /* красная строка - отступ первой строки */
+            margin: 0 0 15px 0; /* отступ между абзацами */
+        }
+
+        .chapter-content p:last-child {
+            margin-bottom: 0; /* убираем отступ у последнего абзаца */
+        }
+
+        /* ========== СТРАНИЦА ПЕРСОНАЖА ========== */
+        .character-page {
+            background: #faf1ea;
+            border-radius: 48px;
+            padding: clamp(1.5rem, 3vw, 2rem);
+            width: 100%;
+        }
+
+        .character-page > div {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+            gap: 2rem;
+        }
+
+        /* ========== ГАЛЕРЕЯ АРТОВ ========== */
+        .art-thumb-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1rem 0 0;
+        }
+
+        .art-thumb {
+            width: clamp(80px, 15vw, 100px);
+            height: clamp(80px, 15vw, 100px);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 3px solid #f0dccc;
+            transition: 0.2s;
+            cursor: pointer;
+            background: #dac2b2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .art-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        .art-thumb:hover {
+            transform: scale(1.05);
+            border-color: #b96f42;
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        /* ========== МОДАЛЬНОЕ ОКНО ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(255,255,240,0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 1001;
+        }
+
+        .modal-close:hover {
+            color: #dbb79b;
+            transform: scale(1.2);
+        }
+
+        /* ========== КНОПКИ ========== */
+        .back-home {
+            display: inline-block;
+            margin: 2rem 0 1rem;
+            background: #f0e2d8;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #3f2a1b;
+            text-decoration: none;
+            border: 1px solid #dbbcac;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        hr {
+            border: 1px dashed #cfb7a9;
+            margin: 2rem 0;
+        }
+
+        /* ========== ПОДВАЛ ========== */
+        footer {
+            text-align: center;
+            color: #896e5b;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e7d2c4;
+            width: 100%;
+        }
+
+        .author-credits {
+            background: #f0e4da;
+            border-radius: 60px;
+            padding: 1.5rem 1rem;
+            margin-top: 1rem;
+            font-size: clamp(0.8rem, 2.2vw, 1rem);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .author-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem 1.5rem;
+            width: 100%;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: #5e3823;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+        }
+        @media (max-width: 500px) {
+            .author-name { white-space: normal; }
+        }
+
+        .author-row a {
+            color: #794f36;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 500;
+            transition: 0.2s;
+            word-break: break-word;
+        }
+
+        .footer-note {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        img, svg, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+        p, h1, h2, h3, div {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page" id="app">
+    <div class="breadcrumb-nav" id="breadcrumb"></div>
+    <div id="content-container"></div>
+</div>
+
+<div id="art-modal" class="modal">
+    <span class="modal-close" id="modal-close">&times;</span>
+    <img class="modal-content" id="modal-image" src="" alt="Полноразмерный арт">
+</div>
+
+<script>
+    (function() {
+        // ========== ДАННЫЕ САЙТА — ВСЕ 9 КНИГ С ФОРМАТИРОВАННЫМ ТЕКСТОМ ГЛАВ ==========
+        const booksData = [
+            {
+                id: 'empire-of-storms',
+                title: 'Империя шторма',
+                coverDesc: 'цикл «Ветра зимы»',
+                description: 'Мрачное эпическое фэнтези, где магия крови сталкивается с железными тронами.',
+                plot: 'Сюжет книги "Империя шторма" рассказывает о борьбе за трон в разорённом магией мире.',
+                chapters: [
+                    { 
+                        id: 'ch1', 
+                        title: 'Пролог: Пепел прошлого', 
+                        content: `<p>Кайлен просыпается в руинах крепости. Воспоминания о предательстве короля жгут сильнее ран. Он решает собрать отряд изгнанников.</p>
+<p>За окнами крепости воют ветры, а в воздухе пахнет пеплом и магией. Кайлен знает, что где-то в этих руинах спрятан древний артефакт, способный вернуть ему силу.</p>
+<p>Он встаёт, отряхивает плащ и идёт к выходу из зала. Впереди его ждёт долгий путь.</p>` 
+                    },
+                    { 
+                        id: 'ch2', 
+                        title: 'Глава 1: Ведьма из тумана', 
+                        content: `<p>Вериния Эш появляется перед Кайленом, требуя защиты от охотников за головами. В обмен она предлагает магическую помощь.</p>
+<p>Кайлен не доверяет тёмным эльфам, но выбора нет. Он соглашается, и они заключают союз, скреплённый кровью.</p>` 
+                    },
+                    { 
+                        id: 'ch3', 
+                        title: 'Глава 2: Перевал душ', 
+                        content: `<p>Отряд попадает в засаду. Вериния использует запретную магию, чтобы спасти всех, но это привлекает внимание Тёмного совета.</p>
+<p>Кайлен понимает, что теперь за ними охотятся не только люди, но и могущественные маги.</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Кайлен Львиное Сердце', 
+                        folder: 'kaylen', 
+                        refs: 'Полководец изгнанник, 27 лет, шрам на левой брови.', 
+                        story: 'Был предан своим королём, теперь ведёт отряд «Пепельные волки». Ищет древний артефакт.', 
+                        arts: [
+                            { thumb: 'https://sun59-2.userapi.com/s/v1/ig2/IiZJrD-mUHids-OYMiysQiCWgtIbUVWaYn1Lwf7CNV2qNtEeI-jQ8cSwKZA7mG_tlNCEv4PwtkiHRGKgmavo18Fx.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080,1280x1280,1440x1440,2000x2000&from=bu&cs=2000x0', full: 'https://sun59-2.userapi.com/s/v1/ig2/IiZJrD-mUHids-OYMiysQiCWgtIbUVWaYn1Lwf7CNV2qNtEeI-jQ8cSwKZA7mG_tlNCEv4PwtkiHRGKgmavo18Fx.jpg?quality=95&as=32x32,48x48,72x72,108x108,160x160,240x240,360x360,480x480,540x540,640x640,720x720,1080x1080,1280x1280,1440x1440,2000x2000&from=bu&cs=2000x0' },
+                            { thumb: 'https://via.placeholder.com/100x100/A0522D/FFFFFF?text=арт2', full: 'https://via.placeholder.com/800x600/A0522D/FFFFFF?text=Тату' },
+                            { thumb: 'https://via.placeholder.com/100x100/CD853F/FFFFFF?text=арт3', full: 'https://via.placeholder.com/800x600/CD853F/FFFFFF?text=Битва' }
+                        ]
+                    },
+                    { 
+                        name: 'Вериния Эш', 
+                        folder: 'verinia', 
+                        refs: 'Тёмная эльфийка, маг хаоса, 184 года.', 
+                        story: 'Последняя из рода Эш. Пытается снять проклятие со своей крови. Союзница Кайлена.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/5D3A1A/FFFFFF?text=ритуал', full: 'https://via.placeholder.com/800x600/5D3A1A/FFFFFF?text=Ритуальный+наряд' },
+                            { thumb: 'https://via.placeholder.com/100x100/7B3F00/FFFFFF?text=посох', full: 'https://via.placeholder.com/800x600/7B3F00/FFFFFF?text=Магический+посох' },
+                            { thumb: 'https://via.placeholder.com/100x100/9E5B3A/FFFFFF?text=лицо', full: 'https://via.placeholder.com/800x600/9E5B3A/FFFFFF?text=Лицо+крупно' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'silver-ashes',
+                title: 'Серебряный пепел',
+                coverDesc: 'детектив в стиле нуар',
+                description: 'Городское фэнтези 1920-х. Частный сыщик расследует убийства, связанные с потусторонними.',
+                plot: 'Частный детектив Морган Кейн берётся за таинственное убийство в клубе "Альгамбра".',
+                chapters: [
+                    { 
+                        id: 'ch1', 
+                        title: 'Глава 1: Дождливый вечер', 
+                        content: `<p>Морган сидит в офисе, когда входит женщина в длинном пальто. Она просит защитить её от "людей из тумана".</p>
+<p>Дождь барабанит по стеклу. Морган закуривает сигарету и слушает её историю. Он ещё не знает, что это дело изменит его жизнь.</p>` 
+                    },
+                    { 
+                        id: 'ch2', 
+                        title: 'Глава 2: Сирена', 
+                        content: `<p>Ивлин поёт в клубе, но Морган замечает, что её голос зачаровывает публику. Он понимает, что она не совсем человек.</p>
+<p>После выступления он подходит к ней, и она рассказывает правду: она сирена, и охотники хотят убить её.</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Морган Кейн', 
+                        folder: 'morgan', 
+                        refs: 'частный детектив, ветеран, 45 лет, любит виски.', 
+                        story: 'Бывший полицейский. Видит призраков после ранения. Ищет убийцу сестры.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/2C2C2C/FFFFFF?text=шляпа', full: 'https://via.placeholder.com/800x600/2C2C2C/FFFFFF?text=Шляпа+и+плащ' },
+                            { thumb: 'https://via.placeholder.com/100x100/4A4A4A/FFFFFF?text=офис', full: 'https://via.placeholder.com/800x600/4A4A4A/FFFFFF?text=Офис+с+неоном' },
+                            { thumb: 'https://via.placeholder.com/100x100/6B6B6B/FFFFFF?text=револьвер', full: 'https://via.placeholder.com/800x600/6B6B6B/FFFFFF?text=Револьвер' }
+                        ]
+                    },
+                    { 
+                        name: 'Ивлин Роуз', 
+                        folder: 'evelyn', 
+                        refs: 'певица в клубе «Альгамбра», 28 лет, на самом деле сирена.', 
+                        story: 'Спасается от охотников за нелюдями. Помогает Моргану в обмен на защиту.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/8B4789/FFFFFF?text=платье', full: 'https://via.placeholder.com/800x600/8B4789/FFFFFF?text=Сценическое+платье' },
+                            { thumb: 'https://via.placeholder.com/100x100/5F9EA0/FFFFFF?text=вода', full: 'https://via.placeholder.com/800x600/5F9EA0/FFFFFF?text=Под+водой' },
+                            { thumb: 'https://via.placeholder.com/100x100/D2B48C/FFFFFF?text=фото', full: 'https://via.placeholder.com/800x600/D2B48C/FFFFFF?text=Старое+фото' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'children-of-mist',
+                title: 'Дети тумана',
+                coverDesc: 'young adult / мистика',
+                description: 'Подростки обнаруживают в себе силы тумана.',
+                plot: 'Финн узнаёт, что его сестра не пропала, а скрывается от ордена "Чистый свет".',
+                chapters: [
+                    { 
+                        id: 'ch1', 
+                        title: 'Часть 1: Исчезновение', 
+                        content: `<p>Финн возвращается домой и понимает, что сестра не ночевала. Он находит её дневник с рисунками тумана.</p>
+<p>На последней странице написано: "Если меня не станет, ищи меня в тумане". Финн сжимает дневник и выбегает на улицу.</p>` 
+                    },
+                    { 
+                        id: 'ch2', 
+                        title: 'Часть 2: Тайна приюта', 
+                        content: `<p>Вместе с друзьями Финн проникает в заброшенный приют, где, по слухам, останавливаются "туманные".</p>
+<p>Внутри темно и сыро. Внезапно туман начинает сгущаться, и Финн чувствует, что кто-то смотрит на них из темноты.</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Финн О’Райли', 
+                        folder: 'finn', 
+                        refs: '16 лет, может становиться невидимым в тумане.', 
+                        story: 'Ирландский парень, переехал в Америку. Сестра пропала при загадочных обстоятельствах.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/708090/FFFFFF?text=худи', full: 'https://via.placeholder.com/800x600/708090/FFFFFF?text=Худи+с+капюшоном' },
+                            { thumb: 'https://via.placeholder.com/100x100/526F7F/FFFFFF?text=переулок', full: 'https://via.placeholder.com/800x600/526F7F/FFFFFF?text=Туманный+переулок' },
+                            { thumb: 'https://via.placeholder.com/100x100/3F5E6E/FFFFFF?text=дневник', full: 'https://via.placeholder.com/800x600/3F5E6E/FFFFFF?text=Старый+дневник' }
+                        ]
+                    }
+                ]
+            },
+            // КНИГА 4: Багровый трон
+            { 
+                id: 'crimson-throne', 
+                title: 'Багровый трон', 
+                coverDesc: 'политическое фэнтези', 
+                description: 'Интриги, дворцовые перевороты и древние пророчества.', 
+                plot: 'Наследница престола вынуждена бежать после переворота. Её сопровождает загадочный страж.', 
+                chapters: [
+                    { 
+                        id: 'ct1', 
+                        title: 'Книга 1: Падение', 
+                        content: `<p>Королевство охвачено мятежом. Принцесса Элинор бежит через подземный ход, слыша за спиной шаги убийц.</p>
+<p>Свеча в её руке гаснет, но она продолжает идти в темноте, надеясь найти выход.</p>` 
+                    },
+                    { 
+                        id: 'ct2', 
+                        title: 'Книга 2: Страж', 
+                        content: `<p>Таинственный незнакомец в чёрных доспехах спасает принцессу от наёмников. Он клянётся защищать её.</p>
+<p>Кто он? Почему рискует жизнью ради неё? Элинор не знает ответов, но у неё нет выбора — только довериться ему.</p>` 
+                    },
+                    { 
+                        id: 'ct3', 
+                        title: 'Книга 3: Пророчество', 
+                        content: `<p>В руинах старого храма они находят свиток, предсказывающий возвращение истинного короля.</p>
+<p>На свитке изображена Элинор с короной на голове. Страж понимает: пророчество говорит о ней.</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Элинор', 
+                        folder: 'elinor', 
+                        refs: 'принцесса, 19 лет, наследница престола. Обладает даром видеть ложь.', 
+                        story: 'Скрывается от убийц, посланных узурпатором. Должна найти древний артефакт, чтобы доказать своё право на трон.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/8B0000/FFFFFF?text=портрет', full: 'https://via.placeholder.com/800x600/8B0000/FFFFFF?text=Портрет+принцессы' },
+                            { thumb: 'https://via.placeholder.com/100x100/A52A2A/FFFFFF?text=корона', full: 'https://via.placeholder.com/800x600/A52A2A/FFFFFF?text=Корона' },
+                            { thumb: 'https://via.placeholder.com/100x100/BC8F8F/FFFFFF?text=платье', full: 'https://via.placeholder.com/800x600/BC8F8F/FFFFFF?text=Дорожное+платье' }
+                        ]
+                    },
+                    { 
+                        name: 'Страж', 
+                        folder: 'guardian', 
+                        refs: 'таинственный воин в чёрных доспехах, возраст неизвестен.', 
+                        story: 'Никто не знает его настоящего имени. Он появился в день переворота и спас принцессу. Кажется, он служил ещё её деду.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/2F4F4F/FFFFFF?text=доспех', full: 'https://via.placeholder.com/800x600/2F4F4F/FFFFFF?text=Чёрные+доспехи' },
+                            { thumb: 'https://via.placeholder.com/100x100/4A5D5D/FFFFFF?text=шлем', full: 'https://via.placeholder.com/800x600/4A5D5D/FFFFFF?text=Шлем+с+забралом' },
+                            { thumb: 'https://via.placeholder.com/100x100/696969/FFFFFF?text=меч', full: 'https://via.placeholder.com/800x600/696969/FFFFFF?text=Древний+меч' }
+                        ]
+                    }
+                ]
+            },
+            // КНИГА 5: Эхо пустоты
+            { 
+                id: 'echoes-of-void', 
+                title: 'Эхо пустоты', 
+                coverDesc: 'космическая опера', 
+                description: 'Далёкое будущее, искусственный интеллект и потерянные колонии.', 
+                plot: 'Экипаж разведывательного корабля находит сигнал с погибшей станции. То, что они обнаруживают, меняет всё.', 
+                chapters: [
+                    { 
+                        id: 'ev1', 
+                        title: 'Сигнал', 
+                        content: `<p>Корабль "Надежда" ловит аномальный сигнал из сектора 9, откуда уже 50 лет никто не выходил на связь.</p>
+<p>Капитан Нова смотрит на экран. Сигнал повторяется каждые 30 секунд. Это не может быть случайностью.</p>` 
+                    },
+                    { 
+                        id: 'ev2', 
+                        title: 'Станция-призрак', 
+                        content: `<p>Экипаж находит станцию "Ковчег-7" покинутой, но системы жизнеобеспечения всё ещё работают.</p>
+<p>Везде следы борьбы. Лейтенант Зорин находит чей-то дневник — последние записи полны ужаса.</p>` 
+                    },
+                    { 
+                        id: 'ev3', 
+                        title: 'Пробуждение', 
+                        content: `<p>Они случайно активируют древний ИИ, который начинает охоту на непрошеных гостей.</p>
+<p>Голос из динамиков говорит: "Вы нарушили покой мёртвых. Оставайтесь здесь навсегда".</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Капитан Нова', 
+                        folder: 'nova', 
+                        refs: 'капитан, 35 лет. Бывший военный, хладнокровна и решительна.', 
+                        story: 'Командует кораблём "Надежда". В прошлом потеряла экипаж во время аналогичной миссии и теперь хочет узнать правду.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/4682B4/FFFFFF?text=форма', full: 'https://via.placeholder.com/800x600/4682B4/FFFFFF?text=Капитанская+форма' },
+                            { thumb: 'https://via.placeholder.com/100x100/5F9EA0/FFFFFF?text=шлем', full: 'https://via.placeholder.com/800x600/5F9EA0/FFFFFF?text=Шлем+скафандра' },
+                            { thumb: 'https://via.placeholder.com/100x100/B0C4DE/FFFFFF?text=мостик', full: 'https://via.placeholder.com/800x600/B0C4DE/FFFFFF?text=Капитанский+мостик' }
+                        ]
+                    },
+                    { 
+                        name: 'Лейтенант Зорин', 
+                        folder: 'zorin', 
+                        refs: 'пилот, 28 лет. Технический гений, но замкнут и нелюдим.', 
+                        story: 'Родился на колонии, уничтоженной пиратами. С тех пор ненавидит одиночество и предпочитает общество машин.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/2F4F4F/FFFFFF?text=пилот', full: 'https://via.placeholder.com/800x600/2F4F4F/FFFFFF?text=Пилотский+комбинезон' },
+                            { thumb: 'https://via.placeholder.com/100x100/4A5D5D/FFFFFF?text=дрон', full: 'https://via.placeholder.com/800x600/4A5D5D/FFFFFF?text=Ремонтный+дрон' },
+                            { thumb: 'https://via.placeholder.com/100x100/696969/FFFFFF?text=кабина', full: 'https://via.placeholder.com/800x600/696969/FFFFFF?text=Кабина+пилота' }
+                        ]
+                    }
+                ]
+            },
+            // КНИГА 6: Последний дракон
+            { 
+                id: 'last-dragon', 
+                title: 'Последний дракон', 
+                coverDesc: 'героическое фэнтези', 
+                description: 'Мир, где люди и драконы были союзниками, но времена изменились.', 
+                plot: 'Молодой дракон отправляется на поиски пропавшего наездника. Ему предстоит узнать правду о войне людей и драконов.', 
+                chapters: [
+                    { 
+                        id: 'ld1', 
+                        title: 'Пробуждение', 
+                        content: `<p>Дракон Игнис просыпается в опустевшем логове. Его наездник Арран не вернулся с охоты.</p>
+<p>Игнис рычит, выпуская струйки дыма из ноздрей. Он чувствует запах крови и понимает: случилось что-то ужасное.</p>` 
+                    },
+                    { 
+                        id: 'ld2', 
+                        title: 'Следы', 
+                        content: `<p>Игнис находит следы битвы и понимает, что на людей напали. Кто-то хочет разжечь войну между людьми и драконами.</p>
+<p>Вокруг разбросаны стрелы с чёрным оперением — таких раньше не было.</p>` 
+                    },
+                    { 
+                        id: 'ld3', 
+                        title: 'Полёт', 
+                        content: `<p>Дракон отправляется в земли людей, нарушая древний запрет.</p>
+<p>Он летит высоко в небе, и впервые за много лет люди видят дракона. Страх и надежда охватывают королевства.</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Игнис', 
+                        folder: 'ignis', 
+                        refs: 'дракон, 120 лет. Огненно-красный, последний из своего выводка.', 
+                        story: 'Последний дракон, уцелевший после эпидемии. С детства связан с Арраном и готов на всё, чтобы спасти друга.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/DC143C/FFFFFF?text=дракон', full: 'https://via.placeholder.com/800x600/DC143C/FFFFFF?text=Огненный+дракон' },
+                            { thumb: 'https://via.placeholder.com/100x100/B22222/FFFFFF?text=крылья', full: 'https://via.placeholder.com/800x600/B22222/FFFFFF?text=Расправленные+крылья' },
+                            { thumb: 'https://via.placeholder.com/100x100/CD5C5C/FFFFFF?text=чешуя', full: 'https://via.placeholder.com/800x600/CD5C5C/FFFFFF?text=Крупный+план+чешуи' }
+                        ]
+                    },
+                    { 
+                        name: 'Арран', 
+                        folder: 'arran', 
+                        refs: 'человек, 24 года. Наездник дракона, следопыт.', 
+                        story: 'Вырос рядом с драконьим логовом. Первый за сто лет человек, с которым заключил союз дракон. Пропал при загадочных обстоятельствах.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/228B22/FFFFFF?text=следопыт', full: 'https://via.placeholder.com/800x600/228B22/FFFFFF?text=Одежда+следопыта' },
+                            { thumb: 'https://via.placeholder.com/100x100/32CD32/FFFFFF?text=лук', full: 'https://via.placeholder.com/800x600/32CD32/FFFFFF?text=Длинный+лук' },
+                            { thumb: 'https://via.placeholder.com/100x100/6B8E23/FFFFFF?text=амулет', full: 'https://via.placeholder.com/800x600/6B8E23/FFFFFF?text=Амулет+связи' }
+                        ]
+                    }
+                ]
+            },
+            // КНИГА 7: Охотники за тенью
+            { 
+                id: 'shadow-hunters', 
+                title: 'Охотники за тенью', 
+                coverDesc: 'urban fantasy', 
+                description: 'В современном мегаполисе существует тайная организация, следящая за нечистью.', 
+                plot: 'Новый рекрут попадает в мир заговоров и монстров. Ему предстоит узнать, что монстры не всегда те, кем кажутся.', 
+                chapters: [
+                    { 
+                        id: 'sh1', 
+                        title: 'Инициация', 
+                        content: `<p>Алекс соглашается пройти обряд, после которого его жизнь меняется. Он видит монстров, скрытых среди людей.</p>
+<p>Мир вокруг становится другим. Обычные прохожие оказываются чудовищами, скрывающимися под масками людей.</p>` 
+                    },
+                    { 
+                        id: 'sh2', 
+                        title: 'Наставник', 
+                        content: `<p>Ветеран охотников Маркус берёт Алекса под крыло. Первая охота на тёмную сущность в метро.</p>
+<p>В темноте туннеля светятся чьи-то глаза. Алекс сжимает в руках серебряный клинок.</p>` 
+                    },
+                    { 
+                        id: 'sh3', 
+                        title: 'Тайна', 
+                        content: `<p>Алекс узнаёт, что его сестра тоже была охотницей и пропала при странных обстоятельствах.</p>
+<p>Маркус молчит, отводя взгляд. Он что-то знает, но не говорит. Алекс решает сам найти правду.</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Алекс', 
+                        folder: 'alex', 
+                        refs: 'студент, 20 лет. После инициации обретает способность видеть тени.', 
+                        story: 'Случайно увидел монстра и был спасён охотниками. Согласился на инициацию, чтобы найти пропавшую сестру.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/2C3E50/FFFFFF?text=куртка', full: 'https://via.placeholder.com/800x600/2C3E50/FFFFFF?text=Кожаная+куртка' },
+                            { thumb: 'https://via.placeholder.com/100x100/34495E/FFFFFF?text=амулет', full: 'https://via.placeholder.com/800x600/34495E/FFFFFF?text=Защитный+амулет' },
+                            { thumb: 'https://via.placeholder.com/100x100/7F8C8D/FFFFFF?text=клинок', full: 'https://via.placeholder.com/800x600/7F8C8D/FFFFFF?text=Серебряный+клинок' }
+                        ]
+                    },
+                    { 
+                        name: 'Маркус', 
+                        folder: 'marcus', 
+                        refs: 'ветеран охотников, 45 лет. Носит плащ и шляпу.', 
+                        story: 'Охотится на нечисть уже 20 лет. Потерял семью из-за вампиров, поэтому жесток и беспощаден к монстрам.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/4A4A4A/FFFFFF?text=плащ', full: 'https://via.placeholder.com/800x600/4A4A4A/FFFFFF?text=Длинный+плащ' },
+                            { thumb: 'https://via.placeholder.com/100x100/5D6D7E/FFFFFF?text=арбалет', full: 'https://via.placeholder.com/800x600/5D6D7E/FFFFFF?text=Арбалет' },
+                            { thumb: 'https://via.placeholder.com/100x100/6C7A89/FFFFFF?text=шляпа', full: 'https://via.placeholder.com/800x600/6C7A89/FFFFFF?text=Шляпа' }
+                        ]
+                    }
+                ]
+            },
+            // КНИГА 8: Механическое сердце
+            { 
+                id: 'clockwork-heart', 
+                title: 'Механическое сердце', 
+                coverDesc: 'стимпанк / дизельпанк', 
+                description: 'Изобретатель создаёт андроида, который обретает душу.', 
+                plot: 'Полиция охотится за "беглым механизмом", считая его опасным. Но андроид просто хочет быть свободным.', 
+                chapters: [
+                    { 
+                        id: 'chh1', 
+                        title: 'Создание', 
+                        content: `<p>Виктор запускает механизм впервые. Андроид открывает глаза и смотрит на своего создателя.</p>
+<p>Шестерёнки начинают вращаться, пар вырывается из сочленений. "Адам", — шепчет Виктор.</p>` 
+                    },
+                    { 
+                        id: 'chh2', 
+                        title: 'Побег', 
+                        content: `<p>Соседи вызывают полицию, испугавшись шума. Виктор приказывает андроиду бежать.</p>
+<p>Адам выпрыгивает в окно и бежит по крышам, впервые чувствуя страх.</p>` 
+                    },
+                    { 
+                        id: 'chh3', 
+                        title: 'Охота', 
+                        content: `<p>Городская стража начинает облаву на "опасный механизм". Андроид прячется в трущобах.</p>
+<p>Там он встречает таких же, как он — отверженных. Они дают ему еду и укрытие.</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Виктор', 
+                        folder: 'victor', 
+                        refs: 'изобретатель, 50 лет. Гениальный механик, но одинок.', 
+                        story: 'Посвятил жизнь созданию искусственного разума. Когда его творение ожило, он понял, что создал не машину, а друга.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/8B4513/FFFFFF?text=мастер', full: 'https://via.placeholder.com/800x600/8B4513/FFFFFF?text=Мастерская' },
+                            { thumb: 'https://via.placeholder.com/100x100/A0522D/FFFFFF?text=чертежи', full: 'https://via.placeholder.com/800x600/A0522D/FFFFFF?text=Чертежи+андроида' },
+                            { thumb: 'https://via.placeholder.com/100x100/CD853F/FFFFFF?text=очки', full: 'https://via.placeholder.com/800x600/CD853F/FFFFFF?text=Очки+механика' }
+                        ]
+                    },
+                    { 
+                        name: 'Адам', 
+                        folder: 'adam', 
+                        refs: 'андроид, внешне похож на юношу. Механическое сердце бьётся в груди.', 
+                        story: 'Создан из латуни и стали, но способен чувствовать. Не понимает, почему люди боятся его.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/B8860B/FFFFFF?text=андроид', full: 'https://via.placeholder.com/800x600/B8860B/FFFFFF?text=Андроид' },
+                            { thumb: 'https://via.placeholder.com/100x100/DAA520/FFFFFF?text=сердце', full: 'https://via.placeholder.com/800x600/DAA520/FFFFFF?text=Механическое+сердце' },
+                            { thumb: 'https://via.placeholder.com/100x100/FFD700/FFFFFF?text=шестерни', full: 'https://via.placeholder.com/800x600/FFD700/FFFFFF?text=Шестерни' }
+                        ]
+                    }
+                ]
+            },
+            // КНИГА 9: Сладкие кошмары
+            { 
+                id: 'sweet-nightmares', 
+                title: 'Сладкие кошмары', 
+                coverDesc: 'хоррор / мистика', 
+                description: 'Девушка понимает, что её сны начинают влиять на реальность.', 
+                plot: 'Кошмары обретают плоть, и только главная героиня может остановить хаос. Но грань между сном и реальностью стирается.', 
+                chapters: [
+                    { 
+                        id: 'sn1', 
+                        title: 'Первый сон', 
+                        content: `<p>Лена просыпается и видит на стене следы от когтей. Точно такие же, как во сне.</p>
+<p>Сердце колотится. Она подходит к стене и трогает царапины — они настоящие.</p>` 
+                    },
+                    { 
+                        id: 'sn2', 
+                        title: 'Чудовище', 
+                        content: `<p>Ночью к Лене приходит существо из её кошмаров. Оно говорит, что она должна отпустить свои страхи.</p>
+<p>Тень шепчет: "Ты сама создала меня. Но я не враг. Я — твоя защита".</p>` 
+                    },
+                    { 
+                        id: 'sn3', 
+                        title: 'Пробуждение', 
+                        content: `<p>Лена понимает, что её сны — это портал в другой мир, и только она может закрыть его.</p>
+<p>Она берёт кисти и начинает рисовать дверь. Если она откроет её, то сможет войти в мир снов и победить свои страхи.</p>` 
+                    }
+                ],
+                characters: [
+                    { 
+                        name: 'Лена', 
+                        folder: 'lena', 
+                        refs: 'художница, 24 года. Живёт одна и рисует свои кошмары.', 
+                        story: 'С детства видит странные сны. После смерти бабушки кошмары становятся реальностью. Оказывается, дар передаётся по наследству.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/4B0082/FFFFFF?text=кисти', full: 'https://via.placeholder.com/800x600/4B0082/FFFFFF?text=Кисти' },
+                            { thumb: 'https://via.placeholder.com/100x100/483D8B/FFFFFF?text=комната', full: 'https://via.placeholder.com/800x600/483D8B/FFFFFF?text=Тёмная+комната' },
+                            { thumb: 'https://via.placeholder.com/100x100/6A5ACD/FFFFFF?text=картина', full: 'https://via.placeholder.com/800x600/6A5ACD/FFFFFF?text=Страшная+картина' }
+                        ]
+                    },
+                    { 
+                        name: 'Тень', 
+                        folder: 'shadow', 
+                        refs: 'существо из снов Лены, состоит из тьмы.', 
+                        story: 'Не совсем монстр. Оно пытается предупредить Лену об опасности, но из-за страха девушки выглядит угрожающе.', 
+                        arts: [
+                            { thumb: 'https://via.placeholder.com/100x100/2F4F4F/FFFFFF?text=тень', full: 'https://via.placeholder.com/800x600/2F4F4F/FFFFFF?text=Тень' },
+                            { thumb: 'https://via.placeholder.com/100x100/4A5D5D/FFFFFF?text=силуэт', full: 'https://via.placeholder.com/800x600/4A5D5D/FFFFFF?text=Силуэт' },
+                            { thumb: 'https://via.placeholder.com/100x100/696969/FFFFFF?text=глаза', full: 'https://via.placeholder.com/800x600/696969/FFFFFF?text=Горящие+глаза' }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // ========== ПЕРЕМЕННЫЕ СОСТОЯНИЯ ==========
+        let currentRoute = { page: 'home', bookId: null, chapterId: null, characterFolder: null };
+
+        const breadcrumbDiv = document.getElementById('breadcrumb');
+        const contentDiv = document.getElementById('content-container');
+        const modal = document.getElementById('art-modal');
+        const modalImg = document.getElementById('modal-image');
+        const modalClose = document.getElementById('modal-close');
+
+        // ========== ФУНКЦИИ МОДАЛЬНОГО ОКНА ==========
+        function openModal(imgSrc) {
+            modalImg.src = imgSrc;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeModal();
+        });
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        window.openModal = openModal;
+
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+        function findBook(bookId) {
+            return booksData.find(b => b.id === bookId) || null;
+        }
+
+        function findCharacter(book, folderName) {
+            if (!book) return null;
+            return book.characters.find(ch => ch.folder === folderName) || null;
+        }
+
+        // ========== ХЛЕБНЫЕ КРОШКИ ==========
+        function renderBreadcrumb() {
+            let html = '<a href="#"><i class="fas fa-book-open"></i> Все миры</a>';
+            const route = currentRoute;
+
+            if (route.page === 'book') {
+                const book = findBook(route.bookId);
+                if (book) html += `<span class="separator">›</span> <a href="#book/${book.id}"><i class="fas fa-folder-open"></i> ${book.title}</a>`;
+            } else if (route.page === 'plot') {
+                const book = findBook(route.bookId);
+                if (book) {
+                    html += `<span class="separator">›</span> <a href="#book/${book.id}"><i class="fas fa-folder-open"></i> ${book.title}</a>`;
+                    html += `<span class="separator">›</span> <span><i class="fas fa-book"></i> Сюжет</span>`;
+                }
+            } else if (route.page === 'chapter') {
+                const book = findBook(route.bookId);
+                if (book) {
+                    html += `<span class="separator">›</span> <a href="#book/${book.id}"><i class="fas fa-folder-open"></i> ${book.title}</a>`;
+                    html += `<span class="separator">›</span> <a href="#book/${book.id}/plot"><i class="fas fa-book"></i> Сюжет</a>`;
+                    const chapter = book.chapters?.find(ch => ch.id === route.chapterId);
+                    if (chapter) html += `<span class="separator">›</span> <span>${chapter.title}</span>`;
+                }
+            } else if (route.page === 'character') {
+                const book = findBook(route.bookId);
+                if (book) {
+                    html += `<span class="separator">›</span> <a href="#book/${book.id}"><i class="fas fa-folder-open"></i> ${book.title}</a>`;
+                    const character = findCharacter(book, route.characterFolder);
+                    if (character) html += `<span class="separator">›</span> <span><i class="fas fa-user"></i> ${character.name}</span>`;
+                }
+            }
+            breadcrumbDiv.innerHTML = html;
+        }
+
+        // ========== ГЛАВНАЯ СТРАНИЦА ==========
+        function renderHome() {
+            let html = `
+                <h1><i class="fas fa-chess-queen"></i> Хранилище миров</h1>
+                <div class="subhead">Книги, персонажи, референсы и истории — всё в папках</div>
+                <div class="grid-cards">
+            `;
+            booksData.forEach(book => {
+                html += `
+                    <div class="book-card">
+                        <div class="book-icon"><i class="fas fa-book"></i></div>
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-meta">${book.coverDesc}</div>
+                        <div class="folder-links">
+                            <a href="#book/${book.id}" class="folder-link"><i class="fas fa-folder"></i> открыть книгу</a>
+                        </div>
+                        <p>${book.description.substring(0,45)}…</p>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            contentDiv.innerHTML = html;
+        }
+
+        // ========== СТРАНИЦА КНИГИ ==========
+        function renderBookPage(bookId) {
+            const book = findBook(bookId);
+            if (!book) { contentDiv.innerHTML = '<h2>Книга не найдена</h2><a href="#">← на главную</a>'; return; }
+
+            let charactersHtml = '';
+            book.characters.forEach(ch => {
+                charactersHtml += `
+                    <div class="character-item">
+                        <a href="#book/${book.id}/character/${ch.folder}">
+                            <i class="fas fa-user"></i> ${ch.name}
+                            <span style="margin-left:auto;"><i class="fas fa-chevron-right"></i></span>
+                        </a>
+                    </div>
+                `;
+            });
+
+            let html = `
+                <h1><i class="fas fa-folder-open"></i> ${book.title}</h1>
+                <p style="margin-bottom:2rem; font-size:1.2rem;">${book.description}</p>
+                <div class="book-sections">
+                    <div class="section-folder">
+                        <div class="folder-header"><i class="fas fa-folder"></i><h2> Книга</h2></div>
+                        <div class="inside-folder">
+                            <p style="margin-bottom:1.5rem;">Содержание, главы, сюжет.</p>
+                            <a href="#book/${book.id}/plot" class="folder-link-inside"><i class="fas fa-scroll"></i> читать сюжет (книга с главами)</a>
+                        </div>
+                    </div>
+                    <div class="section-folder">
+                        <div class="folder-header"><i class="fas fa-folder"></i><h2> Персонажи</h2></div>
+                        <div class="inside-folder">${charactersHtml}</div>
+                    </div>
+                </div>
+                <a href="#" class="back-home"><i class="fas fa-arrow-left"></i> ко всем книгам</a>
+            `;
+            contentDiv.innerHTML = html;
+        }
+
+        // ========== СТРАНИЦА СЮЖЕТА ==========
+        function renderPlotPage(bookId) {
+            const book = findBook(bookId);
+            if (!book) { contentDiv.innerHTML = '<h2>Книга не найдена</h2>'; return; }
+
+            let chaptersHtml = '';
+            if (book.chapters && book.chapters.length) {
+                book.chapters.forEach(ch => {
+                    chaptersHtml += `
+                        <div class="chapter-item">
+                            <a href="#book/${book.id}/plot/${ch.id}">
+                                <i class="fas fa-bookmark"></i> ${ch.title}
+                            </a>
+                        </div>
+                    `;
+                });
+            } else {
+                chaptersHtml = '<p>Главы ещё не добавлены.</p>';
+            }
+
+            let html = `
+                <h1><i class="fas fa-book-open"></i> ${book.title} — книга</h1>
+                <div class="book-cover">
+                    <h2 style="font-size:2.2rem; margin-bottom:2rem;"> Оглавление</h2>
+                    <div class="chapter-list">
+                        ${chaptersHtml}
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="#book/${book.id}" class="back-home"><i class="fas fa-arrow-left"></i> назад к книге</a>
+                    <a href="#" class="back-home"><i class="fas fa-globe"></i> главная</a>
+                </div>
+            `;
+            contentDiv.innerHTML = html;
+        }
+
+        // ========== СТРАНИЦА ГЛАВЫ ==========
+        function renderChapterPage(bookId, chapterId) {
+            const book = findBook(bookId);
+            if (!book) { contentDiv.innerHTML = '<h2>Книга не найдена</h2>'; return; }
+            const chapter = book.chapters?.find(ch => ch.id === chapterId);
+            if (!chapter) { contentDiv.innerHTML = '<h2>Глава не найдена</h2>'; return; }
+
+            let html = `
+                <h1><i class="fas fa-feather"></i> ${book.title}</h1>
+                <div class="chapter-page">
+                    <div class="chapter-title">${chapter.title}</div>
+                    <div class="chapter-content">${chapter.content}</div>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="#book/${book.id}/plot" class="back-home"><i class="fas fa-arrow-left"></i> к оглавлению</a>
+                    <a href="#book/${book.id}" class="back-home"><i class="fas fa-folder-open"></i> страница книги</a>
+                </div>
+            `;
+            contentDiv.innerHTML = html;
+        }
+
+        // ========== СТРАНИЦА ПЕРСОНАЖА ==========
+        function renderCharacterPage(bookId, folderName) {
+            const book = findBook(bookId);
+            if (!book) { contentDiv.innerHTML = '<h2>Книга не найдена</h2>'; return; }
+            const character = findCharacter(book, folderName);
+            if (!character) { contentDiv.innerHTML = '<h2>Персонаж не найден</h2>'; return; }
+
+            let artsGrid = '';
+            if (character.arts && character.arts.length) {
+                artsGrid = '<div class="art-thumb-grid">';
+                character.arts.forEach((art, index) => {
+                    artsGrid += `
+                        <div class="art-thumb" onclick="window.openModal('${art.full}')">
+                            <img src="${art.thumb}" alt="Арт ${index+1}" loading="lazy">
+                        </div>
+                    `;
+                });
+                artsGrid += '</div>';
+            } else {
+                artsGrid = '<p>🖌️ арты пока не добавлены</p>';
+            }
+
+            let html = `
+                <div style="display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; margin-bottom:2rem;">
+                    <h1><i class="fas fa-user-circle"></i> ${character.name}</h1>
+                    <span style="background:#e7d4c5; padding:0.3rem 1.2rem; border-radius:40px;">${book.title}</span>
+                </div>
+                <div class="character-page">
+                    <div>
+                        <div>
+                            <h3><i class="fas fa-id-card"></i> референсы</h3>
+                            <p style="background:white; border-radius:28px; padding:1.5rem;">${character.refs}</p>
+                            <h3 style="margin-top:1.8rem;"><i class="fas fa-feather"></i> история</h3>
+                            <p style="background:white; border-radius:28px; padding:1.5rem;">${character.story}</p>
+                        </div>
+                        <div>
+                            <h3><i class="fas fa-palette"></i> арты</h3>
+                            ${artsGrid}
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:2rem; display:flex; gap:1rem; flex-wrap:wrap;">
+                    <a href="#book/${book.id}" class="back-home"><i class="fas fa-arrow-left"></i> назад к книге</a>
+                    <a href="#" class="back-home"><i class="fas fa-globe"></i> главная</a>
+                </div>
+            `;
+            contentDiv.innerHTML = html;
+        }
+
+        // ========== РОУТИНГ ==========
+        function route() {
+            const hash = window.location.hash.slice(1) || '/';
+            if (hash === '' || hash === '/') {
+                currentRoute = { page: 'home' };
+                renderHome();
+            } else if (hash.startsWith('book/')) {
+                const parts = hash.split('/');
+                const bookId = parts[1];
+                if (parts.length === 2) {
+                    currentRoute = { page: 'book', bookId };
+                    renderBookPage(bookId);
+                } else if (parts.length === 3 && parts[2] === 'plot') {
+                    currentRoute = { page: 'plot', bookId };
+                    renderPlotPage(bookId);
+                } else if (parts.length === 4 && parts[2] === 'plot') {
+                    currentRoute = { page: 'chapter', bookId, chapterId: parts[3] };
+                    renderChapterPage(bookId, parts[3]);
+                } else if (parts.length === 4 && parts[2] === 'character') {
+                    currentRoute = { page: 'character', bookId, characterFolder: parts[3] };
+                    renderCharacterPage(bookId, parts[3]);
+                } else {
+                    currentRoute = { page: 'home' };
+                    renderHome();
+                }
+            } else {
+                currentRoute = { page: 'home' };
+                renderHome();
+            }
+            renderBreadcrumb();
+        }
+
+        window.addEventListener('hashchange', route);
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!window.location.hash || window.location.hash === '#') window.location.hash = '#';
+            route();
+        });
+    })();
+</script>
+
+<footer>
+    <i class="fas fa-folder-tree"></i> удобное хранение персонажей, референсов, артов и историй
+    <div class="author-credits">
+        <div class="author-row">
+            <span class="author-name"><i class="fas fa-sun"></i> Lorian_De_Lo</span>
+            <a href="#"><i class="fab fa-vk"></i> ВКонтакте</a>
+            <a href="#"><i class="fab fa-telegram"></i> Telegram</a>
+            <a href="#"><i class="fas fa-envelope"></i> lorian.delo@googlemail.com</a>
+        </div>
+        <div class="author-row">
+            <span class="author-name"><i class="fas fa-moon"></i> SkyNightFox0</span>
+            <a href="#"><i class="fab fa-vk"></i> ВКонтакте</a>
+            <a href="#"><i class="fab fa-telegram"></i> Telegram</a>
+            <a href="#"><i class="fas fa-envelope"></i> sky.fox0@googlemail.com</a>
+        </div>
+    </div>
+    <div class="footer-note">Все права на книги и персонажей принадлежат указанным авторам.</div>
+</footer>
+</body>
+</html>
